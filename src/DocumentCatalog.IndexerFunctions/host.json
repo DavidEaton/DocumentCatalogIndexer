@@ -1,0 +1,16 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true
+      }
+    },
+    "logLevel": {
+      "Default": "Information",
+      "Host.Results": "Information",
+      "Function": "Information",
+      "DocumentCatalogIndexer.Functions": "Information"
+    }
+  }
+}

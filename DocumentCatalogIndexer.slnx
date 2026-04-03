@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DocumentCatalog.Shared/DocumentCatalog.Shared.csproj" />
+    <Project Path="src/DocumentCatalog.Backfiller/DocumentCatalog.Backfiller.csproj" />
+    <Project Path="src/DocumentCatalog.IndexerFunctions/DocumentCatalog.IndexerFunctions.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "CII_SQL_CONNECTION": "Server=tcp:...;Database=CII;User Id=...;Password=...;TrustServerCertificate=True;",
+    "CSI_SQL_CONNECTION": "Server=tcp:...;Database=CSI;User Id=...;Password=...;TrustServerCertificate=True;",
+    "DSI_SQL_CONNECTION": "Server=tcp:...;Database=DSI;User Id=...;Password=...;TrustServerCertificate=True;",
+    "DSN_SQL_CONNECTION": "Server=tcp:...;Database=DSN;User Id=...;Password=...;TrustServerCertificate=True;",
+
+    "CII_BLOB_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=cii;AccountKey=...;EndpointSuffix=core.windows.net",
+    "CSI_BLOB_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=csii;AccountKey=...;EndpointSuffix=core.windows.net",
+    "DSI_BLOB_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=dsii;AccountKey=...;EndpointSuffix=core.windows.net",
+    "DSN_BLOB_CONNECTION": "DefaultEndpointsProtocol=https;AccountName=dsni;AccountKey=...;EndpointSuffix=core.windows.net"
+  }
+}
