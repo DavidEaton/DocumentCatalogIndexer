@@ -14,8 +14,8 @@ namespace DocumentCatalog.IndexerFunctions
         {
             var builder = FunctionsApplication.CreateBuilder(args);
 
-            builder.Services.AddApplicationInsightsTelemetryWorkerService();
-            builder.Services.ConfigureFunctionsApplicationInsights();
+            // builder.Services.AddApplicationInsightsTelemetryWorkerService();
+            // builder.Services.ConfigureFunctionsApplicationInsights();
 
             builder.Services.AddSingleton<ICompanyRoutingService, CompanyRoutingService>();
             builder.Services.AddSingleton<IBlobMetadataReader, BlobMetadataReader>();
