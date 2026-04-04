@@ -349,3 +349,47 @@ With:
 This **Document Catalog Indexer** Azure Function App is the **single source of truth for catalog mutation**.
 
 The **Employee Documents Viewer** web application **never attempts to rebuild or reconcile the catalog**.
+
+```
+DocumentCatalogIndexer
+├─ DocumentCatalogIndexer.slnx
+├─ README.md
+├─ sql
+│  ├─ 001_CreateEmployeeDocumentCatalog.sql
+│  ├─ 002_CreateUpsertProcedure.sql
+│  ├─ 003_CreateMarkDeletedProcedure.sql
+│  ├─ 004_CreateSearchView.sql
+│  ├─ 005_CreateSearchProcedure.sql
+│  └─ 006_CreateManagedIdentityGrantExecute.sql
+└─ src
+   ├─ DocumentCatalog.Backfiller
+   │  ├─ BackfillRunner.cs
+   │  ├─ BlobClientFactory.cs
+   │  ├─ CatalogBackfillService.cs
+   │  ├─ DocumentCatalog.Backfiller.csproj
+   │  ├─ Program.cs
+   │  └─ SqlConnectionStringFactory.cs
+   ├─ DocumentCatalog.IndexerFunctions
+   │  ├─ BlobCatalogEventFunction.cs
+   │  ├─ DocumentCatalog.IndexerFunctions.csproj
+   │  ├─ host.json
+   │  ├─ local.settings.json
+   │  ├─ Models
+   │  │  ├─ BlobCatalogItem.cs
+   │  │  ├─ Company.cs
+   │  │  └─ RoutedBlobEvent.cs
+   │  ├─ Program.cs
+   │  ├─ Routing
+   │  │  ├─ CompanyRoutingService.cs
+   │  │  └─ ICompanyRoutingService.cs
+   │  ├─ Sql
+   │  │  ├─ BlobCatalogCommandService.cs
+   │  │  └─ IBlobCatalogCommandService.cs
+   │  └─ Storage
+   │     ├─ BlobMetadataReader.cs
+   │     └─ IBlobMetadataReader.cs
+   └─ DocumentCatalog.Shared
+      ├─ DocumentBlobParser.cs
+      └─ DocumentCatalog.Shared.csproj
+
+```
