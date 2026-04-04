@@ -1,4 +1,4 @@
-namespace DocumentCatalogIndexer.Functions.Models;
+namespace DocumentCatalog.IndexerFunctions.Models;
 
 public sealed record RoutedBlobEvent(
     Company Company,

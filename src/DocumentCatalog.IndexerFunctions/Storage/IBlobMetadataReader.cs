@@ -1,6 +1,6 @@
-using DocumentCatalogIndexer.Functions.Models;
+using DocumentCatalog.IndexerFunctions.Models;
 
-namespace DocumentCatalogIndexer.Functions.Storage;
+namespace DocumentCatalog.IndexerFunctions.Storage;
 
 public interface IBlobMetadataReader
 {

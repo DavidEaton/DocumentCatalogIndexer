@@ -1,8 +1,8 @@
 using Azure.Storage.Blobs;
+using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalog.Shared;
-using DocumentCatalogIndexer.Functions.Models;
 
-namespace DocumentCatalogIndexer.Functions.Storage;
+namespace DocumentCatalog.IndexerFunctions.Storage;
 
 public sealed class BlobMetadataReader : IBlobMetadataReader
 {

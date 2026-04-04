@@ -1,12 +1,11 @@
 using Azure.Messaging.EventGrid;
-using DocumentCatalogIndexer.Functions.Routing;
-using DocumentCatalogIndexer.Functions.Sql;
-using DocumentCatalogIndexer.Functions.Storage;
+using DocumentCatalog.IndexerFunctions.Routing;
+using DocumentCatalog.IndexerFunctions.Sql;
+using DocumentCatalog.IndexerFunctions.Storage;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using DocumentCatalogIndexer.Functions.Models;
 
-namespace DocumentCatalogIndexer.Functions;
+namespace DocumentCatalog.IndexerFunctions;
 
 public sealed class BlobCatalogEventFunction(
     ICompanyRoutingService routingService,

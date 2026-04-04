@@ -10,7 +10,7 @@
       "Default": "Information",
       "Host.Results": "Information",
       "Function": "Information",
-      "DocumentCatalogIndexer.Functions": "Information"
+      "DocumentCatalog.IndexerFunctions": "Information"
     }
   }
 }

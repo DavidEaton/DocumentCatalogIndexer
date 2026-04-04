@@ -1,6 +1,6 @@
-using DocumentCatalogIndexer.Functions.Models;
+using DocumentCatalog.IndexerFunctions.Models;
 
-namespace DocumentCatalogIndexer.Functions.Sql;
+namespace DocumentCatalog.IndexerFunctions.Sql;
 
 public interface IBlobCatalogCommandService
 {

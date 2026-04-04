@@ -1,5 +1,5 @@
+using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalogBackfiller;
-using DocumentCatalogIndexer.Functions.Models;
 using Microsoft.Extensions.Logging;
 
 public sealed class BackfillRunner(

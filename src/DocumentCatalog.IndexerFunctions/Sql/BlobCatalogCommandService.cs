@@ -1,9 +1,9 @@
 using System.Data;
+using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalog.Shared;
-using DocumentCatalogIndexer.Functions.Models;
 using Microsoft.Data.SqlClient;
 
-namespace DocumentCatalogIndexer.Functions.Sql;
+namespace DocumentCatalog.IndexerFunctions.Sql;
 
 public sealed class BlobCatalogCommandService : IBlobCatalogCommandService
 {

@@ -1,6 +1,6 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using DocumentCatalogIndexer.Functions.Models;
+using DocumentCatalog.IndexerFunctions.Models;
 
 namespace DocumentCatalogBackfiller;
 

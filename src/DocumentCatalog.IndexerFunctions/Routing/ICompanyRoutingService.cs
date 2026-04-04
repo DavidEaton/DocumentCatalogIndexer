@@ -1,7 +1,7 @@
 using Azure.Messaging.EventGrid;
-using DocumentCatalogIndexer.Functions.Models;
+using DocumentCatalog.IndexerFunctions.Models;
 
-namespace DocumentCatalogIndexer.Functions.Routing;
+namespace DocumentCatalog.IndexerFunctions.Routing;
 
 public interface ICompanyRoutingService
 {

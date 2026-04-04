@@ -1,6 +1,6 @@
 using Azure.Storage.Blobs.Models;
+using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalog.Shared;
-using DocumentCatalogIndexer.Functions.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Data;

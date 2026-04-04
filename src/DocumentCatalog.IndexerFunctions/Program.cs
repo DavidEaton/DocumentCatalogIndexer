@@ -1,12 +1,12 @@
-using DocumentCatalogIndexer.Functions.Routing;
-using DocumentCatalogIndexer.Functions.Sql;
-using DocumentCatalogIndexer.Functions.Storage;
+using DocumentCatalog.IndexerFunctions.Routing;
+using DocumentCatalog.IndexerFunctions.Sql;
+using DocumentCatalog.IndexerFunctions.Storage;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace DocumentCatalogIndexer.Functions
+namespace DocumentCatalog.IndexerFunctions
 {
     public class Program
     {
