@@ -2,7 +2,7 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using DocumentCatalog.IndexerFunctions.Models;
 
-namespace DocumentCatalogBackfiller
+namespace DocumentCatalog.Backfiller
 {
     public interface IBlobClientFactory
     {
