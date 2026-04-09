@@ -1,3 +1,4 @@
+using DocumentCatalog.Backfiller;
 using DocumentCatalogBackfiller;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

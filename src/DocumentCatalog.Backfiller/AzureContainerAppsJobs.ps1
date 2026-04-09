@@ -18,13 +18,13 @@ $ContainerAppsEnvironmentName = "container-apps-env-ee-docs"
 $ContainerAppsJobName = "documentcatalog-backfiller" # ...as in, the job of this container app is to back-fill the document catalog.
 
 # SQL configuration (non-secret)
-$SqlDatabaseServer = "e04vmu8qq9.database.windows.net"
-$CiiSqlDatabase = "CiiSql"
-$CsiSqlDatabase = "CsiSql"
-$DsiSqlDatabase = "DsiSql"
-$DsnSqlDatabase = "DsnSql"
+$SqlServer = "e04vmu8qq9.database.windows.net"
+$CiiSqlDatabase = "CiiSqlDatabase"
+$CsiSqlDatabase = "CsiSqlDatabase"
+$DsiSqlDatabase = "DsiSqlDatabase"
+$DsnSqlDatabase = "DsnSqlDatabase"
 Write-Host ""
-Write-Host "SQL Database server: $SqlDatabaseServer"
+Write-Host "SQL Database server: $SqlServer"
 
 # Four Companies, four storage account URLs (non-secret)
 $CiiBlobAccountUrl = "https://cii.blob.core.windows.net/"
@@ -90,7 +90,7 @@ Invoke-AzureCli containerapp job create `
     --cpu 0.5 `
     --memory 1.0Gi `
     --env-vars `
-        SQL_SERVER=$SqlDatabaseServer `
+        SqlServer=$SqlServer `
         CII_SQL_DATABASE=$CiiSqlDatabase `
         CSI_SQL_DATABASE=$CsiSqlDatabase `
         DSI_SQL_DATABASE=$DsiSqlDatabase `

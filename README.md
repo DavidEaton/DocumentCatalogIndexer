@@ -50,12 +50,12 @@ EmployeeDocumentCatalog (per-company database)
 
 ## Supported Storage Containers
 
-| Company | Storage Account | Container |
-| ------- | --------------- | --------- |
-| CII     | `cii`           | `hrdocs`  |
-| CSI     | `csii`          | `hrdocs`  |
-| DSI     | `dsii`          | `hrdocs`  |
-| DSN     | `dsni`          | `hrdocs`  |
+| Storage Account | Container |
+| --------------- | --------- |
+| `cii`           | `hrdocs`  |
+| `csii`          | `hrdocs`  |
+| `dsii`          | `hrdocs`  |
+| `dsni`          | `hrdocs`  |
 
 ---
 
@@ -84,7 +84,7 @@ EmployeeDocumentCatalog (per-company database)
 Blobs must follow:
 
 ```
-<EmployeeId>_<DocumentType>.pdf
+<Id>_<DocumentType>.pdf
 ```
 
 Examples:
@@ -96,7 +96,7 @@ Examples:
 
 ### Parsing Rules
 
-* `EmployeeId` → integer prefix
+* `Id` → integer prefix
 * `DocumentTypeToken` → remaining name
 * `DocumentTypeDisplay` → humanized version
 
@@ -185,11 +185,11 @@ Subject begins with:
 
 | Setting                | Example                              |
 | ---------------------- | ------------------------------------ |
-| `CII_SQL_SERVER`       | `e04vmu8qq9.database.windows.net`    |
+| `SQL_SERVER`           | `krypton.database.windows.net`       |
 | `CII_SQL_DATABASE`     | `CiiSql`                             |
 | `CII_BLOB_ACCOUNT_URL` | `https://cii.blob.core.windows.net/` |
 
-Repeat for:
+Repeat for each company:
 
 * CSI
 * DSI
@@ -240,7 +240,7 @@ Use `local.settings.json`:
 ```json
 {
   "Values": {
-    "CII_SQL_SERVER": "...",
+    "SQL_SERVER": "...",
     "CII_SQL_DATABASE": "...",
     "CII_BLOB_ACCOUNT_URL": "https://cii.blob.core.windows.net/"
   }
