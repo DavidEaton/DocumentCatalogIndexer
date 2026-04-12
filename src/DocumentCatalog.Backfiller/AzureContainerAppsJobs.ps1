@@ -1,12 +1,13 @@
+# Run this script from repository root: C:\code\DocumentCatalogIndexer
 $SubscriptionId = "52a72d69-08ab-45ea-8f23-da9245367cf6"
 $ResourceGroupName = "DocumentCatalogIndexer" # documentcatalog-backfiller Only runs manually, infrequently and to initialize and index the document catalog functionality, so we can use the same resource group for both the function app and the container apps job.
 $AzureRegion = "eastus"   # example: eastus
 
 # Azure Container Registry (ACR)
-$ContainerRegistryName = "eedocsacr"
+$ContainerRegistryName = "ciidocsacr"
 
 # Container image and respository - create our own respository of container images within the ACR
-$ContainerImageRepositoryName = "DocumentCatalog" # 
+$ContainerImageRepositoryName = "documentcatalog-backfiller" # 
 $VersionedContainerImageName = "$ContainerImageRepositoryName:2026.04.04.1"
 $LatestContainerImageName = "$ContainerImageRepositoryName:latest"
 $FullyQualifiedContainerImageName = "$ContainerRegistryName.azurecr.io/$ContainerImageRepositoryName:2026.04.04.1"
@@ -14,7 +15,7 @@ Write-Host ""
 Write-Host "ContainerImageRepositoryName: $ContainerImageRepositoryName"
 
 # Azure Container Apps Environment/Jobs
-$ContainerAppsEnvironmentName = "container-apps-env-ee-docs"
+$ContainerAppsEnvironmentName = "container-apps-env-ciidocs"
 $ContainerAppsJobName = "documentcatalog-backfiller" # ...as in, the job of this container app is to back-fill the document catalog.
 
 # SQL configuration (non-secret)
@@ -67,6 +68,7 @@ Invoke-AzureCli acr build `
     --image $VersionedContainerImageName `
     --image $LatestContainerImageName `
     --file src/DocumentCatalog.Backfiller/Dockerfile `
+    .
 
 Write-Host ""
 Write-Host "Creating Azure Container Apps environment..."
@@ -90,7 +92,7 @@ Invoke-AzureCli containerapp job create `
     --cpu 0.5 `
     --memory 1.0Gi `
     --env-vars `
-        SqlServer=$SqlServer `
+        SQL_SERVER=$SqlServer `
         CII_SQL_DATABASE=$CiiSqlDatabase `
         CSI_SQL_DATABASE=$CsiSqlDatabase `
         DSI_SQL_DATABASE=$DsiSqlDatabase `
@@ -106,6 +108,14 @@ Invoke-AzureCli containerapp job identity assign `
     --name $ContainerAppsJobName `
     --resource-group $ResourceGroupName `
     --system-assigned
+
+Write-Host ""
+Write-Host "Assigning Storage Blob Data Reader role to system-managed job identity..."
+Invoke-AzureCli role assignment create `
+    --assignee-object-id $ContainerAppsJobPrincipalId `
+    --assignee-principal-type ServicePrincipal `
+    --role "Storage Blob Data Reader" `
+    --scope $StorageAccountResourceId    
 
 Write-Host ""
 Write-Host "Retrieving Azure Container Apps job principal ID..."

@@ -1,0 +1,17 @@
+.git
+.gitignore
+.vs
+.vscode
+**/bin
+**/obj
+**/TestResults
+**/*.user
+**/*.suo
+**/*.cache
+**/*.log
+**/*.zip
+**/*.tar
+**/*.tar.gz
+**/*.nupkg
+README.md
+sql

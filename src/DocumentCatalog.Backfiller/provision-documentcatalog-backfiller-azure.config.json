@@ -1,0 +1,69 @@
+{
+  "SubscriptionId": "52a72d69-08ab-45ea-8f23-da9245367cf6",
+  "AzureCliPath": "C:\\Program Files\\Microsoft SDKs\\Azure\\CLI2\\wbin\\az.cmd",
+
+  "ResourceGroup": {
+    "Name": "DocumentCatalogIndexer",
+    "Location": "eastus"
+  },
+
+  "ContainerRegistry": {
+    "Name": "ciidocsacr",
+    "Sku": "Basic"
+  },
+
+  "ContainerImage": {
+    "RepositoryName": "documentcatalog-backfiller",
+    "Tag": "2026.04.04.1",
+    "DockerfilePath": "src/DocumentCatalog.Backfiller/Dockerfile"
+  },
+
+  "ContainerApps": {
+    "EnvironmentName": "container-apps-env-cii-docs",
+    "JobName": "documentcatalog-backfiller",
+    "Cpu": "0.5",
+    "Memory": "1.0Gi",
+    "ReplicaTimeout": 1800,
+    "ReplicaRetryLimit": 1,
+    "Parallelism": 1,
+    "ReplicaCompletionCount": 1
+  },
+
+  "Sql": {
+    "ServerName": "e04vmu8qq9.database.windows.net",
+    "ResourceGroupName": "Default-SQL-NorthCentralUS",
+    "Databases": {
+      "CII": "CiiSql",
+      "CSI": "CsiSql",
+      "DSI": "DsiSql",
+      "DSN": "DsnSql"
+    }
+  },
+
+  "StorageAccounts": [
+    {
+      "Code": "CII",
+      "Name": "cii",
+      "ResourceGroupName": "EmployeeDocumentsViewer",
+      "BlobAccountUrl": "https://cii.blob.core.windows.net/"
+    },
+    {
+      "Code": "CSI",
+      "Name": "csii",
+      "ResourceGroupName": "EmployeeDocumentsViewer",
+      "BlobAccountUrl": "https://csii.blob.core.windows.net/"
+    },
+    {
+      "Code": "DSI",
+      "Name": "dsii",
+      "ResourceGroupName": "EmployeeDocumentsViewer",
+      "BlobAccountUrl": "https://dsii.blob.core.windows.net/"
+    },
+    {
+      "Code": "DSN",
+      "Name": "dsni",
+      "ResourceGroupName": "EmployeeDocumentsViewer",
+      "BlobAccountUrl": "https://dsni.blob.core.windows.net/"
+    }
+  ]
+}
