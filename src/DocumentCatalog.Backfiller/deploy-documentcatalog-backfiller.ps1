@@ -237,9 +237,24 @@ if (-not $envExists) {
 # =========================
 # Ensure Job Exists
 # =========================
+$envVars = @(
+    "SQL_SERVER=$SqlServerName",
+    "CII_SQL_DATABASE=$($SqlDatabases.CII)",
+    "CSI_SQL_DATABASE=$($SqlDatabases.CSI)",
+    "DSI_SQL_DATABASE=$($SqlDatabases.DSI)",
+    "DSN_SQL_DATABASE=$($SqlDatabases.DSN)",
+    "BUILD_MARKER=$ImageTag"
+)
+
+foreach ($storageAccount in $StorageAccounts) {
+    $envVars += "$($storageAccount.Code)_BLOB_ACCOUNT_URL=$($storageAccount.BlobAccountUrl)"
+}
+
 $jobExists = Test-JobExists
 
 if (-not $jobExists) {
+    Write-Host "Creating Container Apps job..." -ForegroundColor Cyan
+
     Invoke-Az -StreamOutput containerapp job create `
         --name $JobName `
         --resource-group $ResourceGroupName `
@@ -252,16 +267,18 @@ if (-not $jobExists) {
         --image $FullyQualifiedImage `
         --cpu $Cpu `
         --memory $Memory `
-        --env-vars `
-            SQL_SERVER=$SqlServerName `
-            CII_SQL_DATABASE=$($SqlDatabases.CII) `
-            CSI_SQL_DATABASE=$($SqlDatabases.CSI) `
-            DSI_SQL_DATABASE=$($SqlDatabases.DSI) `
-            DSN_SQL_DATABASE=$($SqlDatabases.DSN) `
-            CII_BLOB_ACCOUNT_URL=$($StorageAccounts | Where-Object Code -eq "CII").BlobAccountUrl `
-            CSI_BLOB_ACCOUNT_URL=$($StorageAccounts | Where-Object Code -eq "CSI").BlobAccountUrl `
-            DSI_BLOB_ACCOUNT_URL=$($StorageAccounts | Where-Object Code -eq "DSI").BlobAccountUrl `
-            DSN_BLOB_ACCOUNT_URL=$($StorageAccounts | Where-Object Code -eq "DSN").BlobAccountUrl | Out-Null
+        --env-vars @envVars | Out-Null
+}
+else {
+    Write-Host "Updating existing Container Apps job..." -ForegroundColor Cyan
+
+    Invoke-Az containerapp job update `
+        --name $JobName `
+        --resource-group $ResourceGroupName `
+        --image $FullyQualifiedImage `
+        --cpu $Cpu `
+        --memory $Memory `
+        --set-env-vars @envVars | Out-Null
 }
 
 # =========================
@@ -322,6 +339,16 @@ Invoke-Az containerapp job registry set `
     --server "$ContainerRegistryName.azurecr.io" `
     --identity system | Out-Null
 
+Write-Host "Refreshing job template after identity and registry configuration..." -ForegroundColor Cyan
+
+Invoke-Az containerapp job update `
+    --name $JobName `
+    --resource-group $ResourceGroupName `
+    --image $FullyQualifiedImage `
+    --cpu $Cpu `
+    --memory $Memory `
+    --set-env-vars @envVars | Out-Null
+    
 # =========================
 # Start Job (optional)
 # =========================
