@@ -1,9 +1,11 @@
+using System.Data;
+using System.Diagnostics;
+using Azure;
 using Azure.Storage.Blobs.Models;
 using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalog.Shared;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using System.Data;
 
 namespace DocumentCatalog.Backfiller;
 
@@ -24,7 +26,9 @@ public sealed class CatalogBackfillService(
     private readonly IBlobClientFactory _blobClientFactory = blobClientFactory;
     private readonly ISqlConnectionStringFactory _sqlConnectionStringFactory = sqlConnectionStringFactory;
     private readonly ILogger<CatalogBackfillService> _logger = logger;
-    private const string CONTAINERNAME = "hrdocs";
+
+    private const string ContainerName = "hrdocs";
+    private const int ProgressInterval = 250;
 
     public async Task<BackfillResult> BackfillCompanyAsync(
         Company company,
@@ -32,35 +36,81 @@ public sealed class CatalogBackfillService(
         int? limit,
         CancellationToken cancellationToken)
     {
-        var container = _blobClientFactory.CreateContainerClient(company, CONTAINERNAME);
+        var accountUrl = _blobClientFactory.GetAccountUrl(company);
+        var databaseName = _sqlConnectionStringFactory.GetDatabaseName(company);
+        var sqlServer = _sqlConnectionStringFactory.GetServerName();
+        var credentialMode = _blobClientFactory.GetCredentialMode();
+
+        _logger.LogInformation(
+            "Resolved configuration for company {Company}. BlobAccountUrl={BlobAccountUrl} Container={ContainerName} SqlServer={SqlServer} SqlDatabase={SqlDatabase} DryRun={DryRun} Limit={Limit} CredentialMode={CredentialMode}",
+            company,
+            accountUrl,
+            ContainerName,
+            sqlServer,
+            databaseName,
+            dryRun,
+            limit,
+            credentialMode);
+
+        var container = _blobClientFactory.CreateContainerClient(company, ContainerName);
+
+        Response<bool> existsResponse;
+        try
+        {
+            existsResponse = await container.ExistsAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"Unable to verify existence of container '{ContainerName}' for company '{company}'.",
+                ex);
+        }
+
+        _logger.LogInformation(
+            "Container '{ContainerName}' exists for company {Company}: {Exists}",
+            ContainerName,
+            company,
+            existsResponse.Value);
+
+        if (!existsResponse.Value)
+        {
+            throw new InvalidOperationException(
+                $"Container '{ContainerName}' does not exist for company '{company}' at '{accountUrl}'.");
+        }
 
         var examined = 0;
+        var candidates = 0;
         var upserted = 0;
-        var skipped = 0;
+        var skippedInvalidName = 0;
+        var sqlFailures = 0;
 
         await foreach (var blobItem in container.GetBlobsAsync(
             traits: BlobTraits.None,
             states: BlobStates.None,
-            prefix: $"{CONTAINERNAME}/",
+            prefix: null,
             cancellationToken: cancellationToken))
         {
-            if (limit.HasValue && examined >= limit.Value)
-                break;
-
             examined++;
+
+            if (limit.HasValue && examined > limit.Value)
+                break;
 
             if (!DocumentBlobParser.TryParseEmployeeDocumentBlobName(
                     blobItem.Name,
                     out var employeeId,
                     out var documentTypeToken))
             {
-                skipped++;
+                skippedInvalidName++;
+
                 _logger.LogDebug(
                     "Skipping blob {BlobName} for company {Company}; name does not match expected convention.",
                     blobItem.Name,
                     company);
+
                 continue;
             }
+
+            candidates++;
 
             var documentTypeDisplay = DocumentBlobParser.HumanizeDocumentType(documentTypeToken);
             var blobNameHash = DocumentBlobParser.ComputeBlobNameHash(blobItem.Name);
@@ -80,29 +130,76 @@ public sealed class CatalogBackfillService(
 
             if (dryRun)
             {
-                _logger.LogInformation(
-                    "[DryRun] Would upsert blob {BlobName} for company {Company}.",
+                _logger.LogDebug(
+                    "[DryRun] Would upsert blob {BlobName} for company {Company}. EmployeeId={EmployeeId} DocumentType={DocumentType}",
                     item.BlobName,
-                    company);
+                    company,
+                    item.EmployeeId,
+                    item.DocumentTypeToken);
+
                 upserted++;
-                continue;
+            }
+            else
+            {
+                try
+                {
+                    await UpsertAsync(item, cancellationToken);
+                    upserted++;
+                }
+                catch (Exception ex)
+                {
+                    sqlFailures++;
+
+                    _logger.LogError(
+                        ex,
+                        "SQL upsert failed for company {Company}, blob {BlobName}, employee {EmployeeId}, document type {DocumentType}.",
+                        company,
+                        item.BlobName,
+                        item.EmployeeId,
+                        item.DocumentTypeToken);
+                }
             }
 
-            await UpsertAsync(item, cancellationToken);
-            upserted++;
-
-            if (upserted % 500 == 0)
+            if (examined % ProgressInterval == 0)
             {
                 _logger.LogInformation(
-                    "Progress for company {Company}: Examined={Examined} Upserted={Upserted} Skipped={Skipped}",
+                    "Progress for company {Company}: Examined={Examined} Candidates={Candidates} Upserted={Upserted} SkippedInvalidName={SkippedInvalidName} SqlFailures={SqlFailures}",
                     company,
                     examined,
+                    candidates,
                     upserted,
-                    skipped);
+                    skippedInvalidName,
+                    sqlFailures);
             }
         }
 
-        return new BackfillResult(examined, upserted, skipped);
+        if (examined == 0)
+        {
+            throw new InvalidOperationException(
+                $"Container '{ContainerName}' for company '{company}' is reachable but enumeration returned zero blobs. Verify the deployed image, credential selection, storage networking rules, and the target account URL.");
+        }
+
+        if (candidates == 0 && examined > 0)
+        {
+            _logger.LogWarning(
+                "Enumerated blobs for company {Company}, but none matched the expected naming convention.",
+                company);
+        }
+
+        if (!dryRun && sqlFailures > 0)
+        {
+            _logger.LogWarning(
+                "Backfill completed for company {Company} with SQL failures. SqlFailures={SqlFailures}",
+                company,
+                sqlFailures);
+        }
+
+        return new BackfillResult(
+            Examined: examined,
+            Candidates: candidates,
+            Upserted: upserted,
+            SkippedInvalidName: skippedInvalidName,
+            SqlFailures: sqlFailures);
     }
 
     private async Task UpsertAsync(
@@ -110,6 +207,7 @@ public sealed class CatalogBackfillService(
         CancellationToken cancellationToken)
     {
         var connectionString = _sqlConnectionStringFactory.Create(item.Company);
+        var stopwatch = Stopwatch.StartNew();
 
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
@@ -133,10 +231,20 @@ public sealed class CatalogBackfillService(
         command.Parameters.AddWithValue("@BlobETag", (object?)item.BlobETag ?? DBNull.Value);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
+
+        stopwatch.Stop();
+
+        _logger.LogDebug(
+            "Upserted blob {BlobName} for company {Company} in {ElapsedMs} ms.",
+            item.BlobName,
+            item.Company,
+            stopwatch.ElapsedMilliseconds);
     }
 }
 
 public sealed record BackfillResult(
     int Examined,
+    int Candidates,
     int Upserted,
-    int Skipped);
+    int SkippedInvalidName,
+    int SqlFailures);

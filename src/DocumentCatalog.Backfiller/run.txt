@@ -1,22 +1,7 @@
 Powershell at C:\code\DocumentCatalogIndexer>
 
-Start before build
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt EnsureContainerRegistry
+Dry Run
+.\src\DocumentCatalog.Backfiller\deploy-documentcatalog-backfiller.ps1 -StartJob -Company CII -DryRun
 
-or exactly at build:
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt BuildAndPushImage
-
-Start after build
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt EnsureContainerAppsEnvironment
-
-Run only through image build
-.\provision-documentcatalog-backfiller-azure.ps1 -StopAfter BuildAndPushImage
-
-Start at build and stop after build
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt BuildAndPushImage -StopAfter BuildAndPushImage
-
-Resume after build failure
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt EnsureContainerAppsEnvironment
-
-Re-run only role assignment sections
-.\provision-documentcatalog-backfiller-azure.ps1 -StartAt EnsureBlobRoleAssignments -StopAfter EnsureRegistryConfiguration
+Production
+.\src\DocumentCatalog.Backfiller\deploy-documentcatalog-backfiller.ps1 -StartJob -Company CII

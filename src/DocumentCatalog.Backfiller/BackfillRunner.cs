@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DocumentCatalog.IndexerFunctions.Models;
 using Microsoft.Extensions.Logging;
 
@@ -24,8 +25,35 @@ namespace DocumentCatalog.Backfiller
                 ? Enum.GetValues<Company>()
                 : [options.Company.Value];
 
+            var runId = Guid.NewGuid().ToString("n");
+            var buildMarker = Environment.GetEnvironmentVariable("BUILD_MARKER") ?? "local-dev";
+
+            using var runScope = _logger.BeginScope(new Dictionary<string, object>
+            {
+                ["RunId"] = runId,
+                ["DryRun"] = options.DryRun,
+                ["Limit"] = options.Limit?.ToString() ?? "(none)",
+                ["BuildMarker"] = buildMarker
+            });
+
+            _logger.LogInformation(
+                "Backfill run starting. BuildMarker={BuildMarker} RunId={RunId} Args={Args} Companies={Companies} DryRun={DryRun} Limit={Limit}",
+                buildMarker,
+                runId,
+                string.Join(" ", args),
+                string.Join(",", companies),
+                options.DryRun,
+                options.Limit);
+
             foreach (var company in companies)
             {
+                var stopwatch = Stopwatch.StartNew();
+
+                using var companyScope = _logger.BeginScope(new Dictionary<string, object>
+                {
+                    ["Company"] = company.ToString()
+                });
+
                 _logger.LogInformation("Starting backfill for company {Company}.", company);
 
                 try
@@ -36,20 +64,33 @@ namespace DocumentCatalog.Backfiller
                         options.Limit,
                         CancellationToken.None);
 
+                    stopwatch.Stop();
+
                     _logger.LogInformation(
-                        "Completed backfill for company {Company}. Examined={Examined} Upserted={Upserted} Skipped={Skipped}",
+                        "Completed backfill for company {Company}. DurationMs={DurationMs} Examined={Examined} Candidates={Candidates} Upserted={Upserted} SkippedInvalidName={SkippedInvalidName} SqlFailures={SqlFailures}",
                         company,
+                        stopwatch.ElapsedMilliseconds,
                         result.Examined,
+                        result.Candidates,
                         result.Upserted,
-                        result.Skipped);
+                        result.SkippedInvalidName,
+                        result.SqlFailures);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Backfill failed for company {Company}.", company);
+                    stopwatch.Stop();
+
+                    _logger.LogError(
+                        ex,
+                        "Backfill failed for company {Company} after {DurationMs} ms.",
+                        company,
+                        stopwatch.ElapsedMilliseconds);
+
                     return 1;
                 }
             }
 
+            _logger.LogInformation("Backfill run completed successfully. RunId={RunId}", runId);
             return 0;
         }
 
