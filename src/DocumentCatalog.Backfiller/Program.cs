@@ -1,9 +1,16 @@
 using DocumentCatalog.Backfiller;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+
+// Explicitly register the managed identity authentication provider for SQL.
+SqlAuthenticationProvider.SetProvider(
+    SqlAuthenticationMethod.ActiveDirectoryManagedIdentity,
+    new ActiveDirectoryAuthenticationProvider());
 
 builder.Services.AddLogging(logging =>
 {
