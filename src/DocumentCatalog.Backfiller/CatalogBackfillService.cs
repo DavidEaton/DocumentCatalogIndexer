@@ -213,7 +213,7 @@ public sealed class CatalogBackfillService(
         await connection.OpenAsync(cancellationToken);
 
         await using var command = new SqlCommand(
-            "Common.usp_EmployeeDocumentCatalog_UpsertFromBlobEvent",
+            "HR.EmployeeDocumentCatalogUpsertFromBlobEvent",
             connection)
         {
             CommandType = CommandType.StoredProcedure,
@@ -225,6 +225,10 @@ public sealed class CatalogBackfillService(
         command.Parameters.AddWithValue("@EmployeeId", item.EmployeeId);
         command.Parameters.AddWithValue("@DocumentTypeToken", item.DocumentTypeToken);
         command.Parameters.AddWithValue("@DocumentTypeDisplay", item.DocumentTypeDisplay);
+        command.Parameters.AddWithValue("@EmployeeName", DBNull.Value);
+        command.Parameters.AddWithValue("@HomeDepartment", DBNull.Value);
+        command.Parameters.AddWithValue("@EmployeeActive", false);
+        command.Parameters.AddWithValue("@EmployeeLookupLastSyncedUtc", DBNull.Value);
         command.Parameters.AddWithValue("@UpdatedUtc", (object?)item.UpdatedUtc ?? DBNull.Value);
         command.Parameters.AddWithValue("@BlobLastModifiedUtc", (object?)item.BlobLastModifiedUtc ?? DBNull.Value);
         command.Parameters.AddWithValue("@ContentType", (object?)item.ContentType ?? DBNull.Value);
