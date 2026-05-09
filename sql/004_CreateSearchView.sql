@@ -6,8 +6,8 @@ select
     emp.NameLastFirst as Employee,
     emp.HomeDepartment as Department,
     d.DocumentTypeDisplay as DocumentType,
-    year(coalesce(d.UpdatedUtc, d.BlobLastModifiedUtc)) as [Year],
-    coalesce(d.UpdatedUtc, d.BlobLastModifiedUtc) as UpdatedUtc,
+    year(d.UpdatedUtc) as [Year],
+    d.UpdatedUtc as UpdatedUtc,
     d.ContentType,
     emp.Active,
     term.TerminationDate
