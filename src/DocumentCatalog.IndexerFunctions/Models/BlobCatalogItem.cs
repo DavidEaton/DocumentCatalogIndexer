@@ -8,7 +8,6 @@ namespace DocumentCatalog.IndexerFunctions.Models
         string DocumentTypeToken,
         string DocumentTypeDisplay,
         DateTimeOffset? UpdatedUtc,
-        DateTimeOffset? BlobLastModifiedUtc,
         string? ContentType,
         string? BlobETag,
         bool IsCatalogCandidate);

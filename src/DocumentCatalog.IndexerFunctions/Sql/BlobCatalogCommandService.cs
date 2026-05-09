@@ -28,7 +28,6 @@ public sealed class BlobCatalogCommandService : IBlobCatalogCommandService
         command.Parameters.AddWithValue("@DocumentTypeToken", item.DocumentTypeToken);
         command.Parameters.AddWithValue("@DocumentTypeDisplay", item.DocumentTypeDisplay);
         command.Parameters.AddWithValue("@UpdatedUtc", (object?)item.UpdatedUtc ?? DBNull.Value);
-        command.Parameters.AddWithValue("@BlobLastModifiedUtc", (object?)item.BlobLastModifiedUtc ?? DBNull.Value);
         command.Parameters.AddWithValue("@ContentType", (object?)item.ContentType ?? DBNull.Value);
         command.Parameters.AddWithValue("@BlobETag", (object?)item.BlobETag ?? DBNull.Value);
 

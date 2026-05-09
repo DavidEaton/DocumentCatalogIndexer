@@ -117,7 +117,6 @@ public sealed class CatalogBackfillService(
                 DocumentTypeToken: documentTypeToken,
                 DocumentTypeDisplay: documentTypeDisplay,
                 UpdatedUtc: blobItem.Properties.LastModified,
-                BlobLastModifiedUtc: blobItem.Properties.LastModified,
                 ContentType: blobItem.Properties.ContentType,
                 BlobETag: blobItem.Properties.ETag?.ToString(),
                 IsCatalogCandidate: true);
@@ -224,7 +223,6 @@ public sealed class CatalogBackfillService(
         command.Parameters.AddWithValue("@EmployeeActive", false);
         command.Parameters.AddWithValue("@EmployeeLookupLastSyncedUtc", DBNull.Value);
         command.Parameters.AddWithValue("@UpdatedUtc", (object?)item.UpdatedUtc ?? DBNull.Value);
-        command.Parameters.AddWithValue("@BlobLastModifiedUtc", (object?)item.BlobLastModifiedUtc ?? DBNull.Value);
         command.Parameters.AddWithValue("@ContentType", (object?)item.ContentType ?? DBNull.Value);
         command.Parameters.AddWithValue("@BlobETag", (object?)item.BlobETag ?? DBNull.Value);
 

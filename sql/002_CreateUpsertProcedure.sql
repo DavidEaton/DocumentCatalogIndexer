@@ -5,7 +5,6 @@ create or alter procedure Common.usp_EmployeeDocumentCatalog_UpsertFromBlobEvent
     @DocumentTypeToken   nvarchar(200),
     @DocumentTypeDisplay nvarchar(200),
     @UpdatedUtc          datetimeoffset(7) = null,
-    @BlobLastModifiedUtc datetimeoffset(7) = null,
     @ContentType         nvarchar(200) = null,
     @BlobETag            nvarchar(128) = null
 as
@@ -19,7 +18,6 @@ begin
         DocumentTypeToken = @DocumentTypeToken,
         DocumentTypeDisplay = @DocumentTypeDisplay,
         UpdatedUtc = @UpdatedUtc,
-        BlobLastModifiedUtc = @BlobLastModifiedUtc,
         ContentType = @ContentType,
         BlobETag = @BlobETag,
         IsDeleted = 0,
@@ -37,7 +35,6 @@ begin
             DocumentTypeToken,
             DocumentTypeDisplay,
             UpdatedUtc,
-            BlobLastModifiedUtc,
             ContentType,
             BlobETag,
             IsDeleted,
@@ -51,7 +48,6 @@ begin
             @DocumentTypeToken,
             @DocumentTypeDisplay,
             @UpdatedUtc,
-            @BlobLastModifiedUtc,
             @ContentType,
             @BlobETag,
             0,

@@ -11,7 +11,6 @@ BEGIN
     DocumentTypeToken     nvarchar(200) not null,
     DocumentTypeDisplay   nvarchar(200) not null,
     UpdatedUtc            datetimeoffset(7) null,
-    BlobLastModifiedUtc   datetimeoffset(7) null,
     ContentType           nvarchar(200) null,
     BlobETag              nvarchar(128) null,
     IsDeleted             bit not null
