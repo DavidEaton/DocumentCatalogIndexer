@@ -14,7 +14,6 @@ public interface ICatalogBackfillService
     Task<BackfillResult> BackfillCompanyAsync(
         Company company,
         bool dryRun,
-        int? limit,
         CancellationToken cancellationToken);
 }
 
@@ -33,7 +32,6 @@ public sealed class CatalogBackfillService(
     public async Task<BackfillResult> BackfillCompanyAsync(
         Company company,
         bool dryRun,
-        int? limit,
         CancellationToken cancellationToken)
     {
         var accountUrl = _blobClientFactory.GetAccountUrl(company);
@@ -42,14 +40,13 @@ public sealed class CatalogBackfillService(
         var credentialMode = _blobClientFactory.GetCredentialMode();
 
         _logger.LogInformation(
-            "Resolved configuration for company {Company}. BlobAccountUrl={BlobAccountUrl} Container={ContainerName} SqlServer={SqlServer} SqlDatabase={SqlDatabase} DryRun={DryRun} Limit={Limit} CredentialMode={CredentialMode}",
+            "Resolved configuration for company {Company}. BlobAccountUrl={BlobAccountUrl} Container={ContainerName} SqlServer={SqlServer} SqlDatabase={SqlDatabase} DryRun={DryRun} CredentialMode={CredentialMode}",
             company,
             accountUrl,
             ContainerName,
             sqlServer,
             databaseName,
             dryRun,
-            limit,
             credentialMode);
 
         var container = _blobClientFactory.CreateContainerClient(company, ContainerName);
@@ -91,9 +88,6 @@ public sealed class CatalogBackfillService(
             cancellationToken: cancellationToken))
         {
             examined++;
-
-            if (limit.HasValue && examined > limit.Value)
-                break;
 
             if (!DocumentBlobParser.TryParseEmployeeDocumentBlobName(
                     blobItem.Name,

@@ -7,8 +7,7 @@ param(
     [switch]$StartJob,
     [ValidateSet("CII","CSI","DSI","DSN")]
     [string]$Company,
-    [switch]$DryRun,
-    [int]$Limit
+    [switch]$DryRun
 )
 
 Set-StrictMode -Version Latest
@@ -254,7 +253,6 @@ $jobExists = Test-JobExists
 
 if (-not $jobExists) {
     Write-Host "Creating Container Apps job..." -ForegroundColor Cyan
-
     Invoke-Az -StreamOutput containerapp job create `
         --name $JobName `
         --resource-group $ResourceGroupName `
@@ -362,11 +360,6 @@ if ($StartJob) {
 
     if ($DryRun) {
         $args += "--dry-run"
-    }
-
-    if ($Limit) {
-        $args += "--limit"
-        $args += $Limit
     }
 
     Invoke-Az -StreamOutput containerapp job start `
