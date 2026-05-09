@@ -32,18 +32,16 @@ namespace DocumentCatalog.Backfiller
             {
                 ["RunId"] = runId,
                 ["DryRun"] = options.DryRun,
-                ["Limit"] = options.Limit?.ToString() ?? "(none)",
                 ["BuildMarker"] = buildMarker
             });
 
             _logger.LogInformation(
-                "Backfill run starting. BuildMarker={BuildMarker} RunId={RunId} Args={Args} Companies={Companies} DryRun={DryRun} Limit={Limit}",
+                "Backfill run starting. BuildMarker={BuildMarker} RunId={RunId} Args={Args} Companies={Companies} DryRun={DryRun}",
                 buildMarker,
                 runId,
                 string.Join(" ", args),
                 string.Join(",", companies),
-                options.DryRun,
-                options.Limit);
+                options.DryRun);
 
             foreach (var company in companies)
             {
@@ -61,7 +59,6 @@ namespace DocumentCatalog.Backfiller
                     var result = await _backfillService.BackfillCompanyAsync(
                         company,
                         options.DryRun,
-                        options.Limit,
                         CancellationToken.None);
 
                     stopwatch.Stop();
@@ -98,7 +95,6 @@ namespace DocumentCatalog.Backfiller
         {
             Company? company = null;
             var dryRun = false;
-            int? limit = null;
             var showHelp = false;
 
             for (var i = 0; i < args.Length; i++)
@@ -124,41 +120,29 @@ namespace DocumentCatalog.Backfiller
                         company = parsed;
                         break;
 
-                    case "--limit":
-                        if (i + 1 >= args.Length)
-                            throw new ArgumentException("--limit requires a value.");
-
-                        if (!int.TryParse(args[++i], out var parsedLimit) || parsedLimit <= 0)
-                            throw new ArgumentException($"Invalid limit '{args[i]}'.");
-
-                        limit = parsedLimit;
-                        break;
-
                     default:
                         throw new ArgumentException($"Unknown argument '{args[i]}'.");
                 }
             }
 
-            return new BackfillOptions(company, dryRun, limit, showHelp);
+            return new BackfillOptions(company, dryRun, showHelp);
         }
 
         private static void PrintUsage()
         {
             Console.WriteLine("""
             Usage:
-              dotnet run -- [--company CII|CSI|DSI|DSN] [--dry-run] [--limit N]
+              dotnet run -- [--company CII|CSI|DSI|DSN] [--dry-run]
 
             Examples:
               dotnet run -- --company CII
               dotnet run -- --company DSI --dry-run
-              dotnet run -- --limit 100
             """);
         }
 
         private sealed record BackfillOptions(
             Company? Company,
             bool DryRun,
-            int? Limit,
             bool ShowHelp);
     }
 }
