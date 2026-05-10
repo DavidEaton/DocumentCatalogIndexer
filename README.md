@@ -233,6 +233,16 @@ Each company database must contain:
 func start
 ```
 
+### Debug in VS Code (Backfiller only)
+
+This repo includes a `.vscode/launch.json` profile that runs only the backfiller project when pressing **F5**.
+
+1. Open **Run and Debug** in VS Code.
+2. Select **Debug DocumentCatalog.Backfiller**.
+3. Press **F5**.
+
+This path uses `dotnet build` + `coreclr` launch on `DocumentCatalog.Backfiller`.
+
 ### Local settings
 
 Use `local.settings.json`:

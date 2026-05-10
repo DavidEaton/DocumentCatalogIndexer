@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug DocumentCatalog.Backfiller",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/DocumentCatalog.Backfiller/bin/Debug/net8.0/DocumentCatalog.Backfiller.dll",
+      "cwd": "${workspaceFolder}/src/DocumentCatalog.Backfiller",
+      "preLaunchTask": "build-backfiller",
+      "stopAtEntry": false,
+      "console": "internalConsole"
+    }
+  ]
+}
