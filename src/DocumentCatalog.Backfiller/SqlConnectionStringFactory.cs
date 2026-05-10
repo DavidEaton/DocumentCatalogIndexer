@@ -1,9 +1,20 @@
 using DocumentCatalog.IndexerFunctions.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace DocumentCatalog.Backfiller;
 
 public sealed class SqlConnectionStringFactory : ISqlConnectionStringFactory
 {
+    private readonly IHostEnvironment _hostEnvironment;
+    private readonly IConfiguration _configuration;
+
+    public SqlConnectionStringFactory(IHostEnvironment hostEnvironment, IConfiguration configuration)
+    {
+        _hostEnvironment = hostEnvironment;
+        _configuration = configuration;
+    }
+
     public string Create(Company company)
     {
         var server = GetServerName();
@@ -19,6 +30,13 @@ public sealed class SqlConnectionStringFactory : ISqlConnectionStringFactory
 
     public string GetServerName()
     {
+        if (_hostEnvironment.IsDevelopment())
+        {
+            var secretServer = _configuration["CompanyConnections:ServerName"];
+            if (!string.IsNullOrWhiteSpace(secretServer))
+                return secretServer;
+        }
+
         var server = Environment.GetEnvironmentVariable("SQL_SERVER");
 
         if (string.IsNullOrWhiteSpace(server))
@@ -29,6 +47,13 @@ public sealed class SqlConnectionStringFactory : ISqlConnectionStringFactory
 
     public string GetDatabaseName(Company company)
     {
+        if (_hostEnvironment.IsDevelopment())
+        {
+            var secretDatabase = GetSqlDatabaseName(company);
+            if (!string.IsNullOrWhiteSpace(secretDatabase))
+                return secretDatabase;
+        }
+
         var database = company switch
         {
             Company.CII => Environment.GetEnvironmentVariable("CII_SQL_DATABASE"),
@@ -42,5 +67,12 @@ public sealed class SqlConnectionStringFactory : ISqlConnectionStringFactory
             throw new InvalidOperationException($"Missing SQL database setting for company '{company}'.");
 
         return database;
+    }
+
+    private string? GetSqlDatabaseName(Company company)
+    {
+        var companyCode = company.ToString();
+        var key = $"CompanyConnections:Companies:{companyCode}:SqlDatabaseName";
+        return _configuration[key];
     }
 }
