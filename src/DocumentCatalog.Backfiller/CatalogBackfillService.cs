@@ -9,14 +9,6 @@ using Microsoft.Extensions.Logging;
 
 namespace DocumentCatalog.Backfiller;
 
-public interface ICatalogBackfillService
-{
-    Task<BackfillResult> BackfillCompanyAsync(
-        Company company,
-        bool dryRun,
-        CancellationToken cancellationToken);
-}
-
 public sealed class CatalogBackfillService(
     IBlobClientFactory blobClientFactory,
     ISqlConnectionStringFactory sqlConnectionStringFactory,

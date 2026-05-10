@@ -9,7 +9,10 @@
       "cwd": "${workspaceFolder}/src/DocumentCatalog.Backfiller",
       "preLaunchTask": "build-backfiller",
       "stopAtEntry": false,
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   ]
 }
