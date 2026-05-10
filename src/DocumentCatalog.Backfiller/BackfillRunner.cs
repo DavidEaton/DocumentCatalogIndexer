@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using DocumentCatalog.IndexerFunctions.Models;
 using Microsoft.Extensions.Logging;
 
@@ -45,7 +44,6 @@ namespace DocumentCatalog.Backfiller
 
             foreach (var company in companies)
             {
-                var stopwatch = Stopwatch.StartNew();
 
                 using var companyScope = _logger.BeginScope(new Dictionary<string, object>
                 {
@@ -61,12 +59,9 @@ namespace DocumentCatalog.Backfiller
                         options.DryRun,
                         CancellationToken.None);
 
-                    stopwatch.Stop();
-
                     _logger.LogInformation(
-                        "Completed backfill for company {Company}. DurationMs={DurationMs} Examined={Examined} Candidates={Candidates} Upserted={Upserted} SkippedInvalidName={SkippedInvalidName} SqlFailures={SqlFailures}",
+                        "Completed backfill for company {Company}. Examined={Examined} Candidates={Candidates} Upserted={Upserted} SkippedInvalidName={SkippedInvalidName} SqlFailures={SqlFailures}",
                         company,
-                        stopwatch.ElapsedMilliseconds,
                         result.Examined,
                         result.Candidates,
                         result.Upserted,
@@ -75,13 +70,11 @@ namespace DocumentCatalog.Backfiller
                 }
                 catch (Exception ex)
                 {
-                    stopwatch.Stop();
-
                     _logger.LogError(
                         ex,
-                        "Backfill failed for company {Company} after {DurationMs} ms.",
+                        "Backfill failed for company {Company}. Cause: {ex.Message}.",
                         company,
-                        stopwatch.ElapsedMilliseconds);
+                        ex.Message);
 
                     return 1;
                 }
@@ -93,8 +86,10 @@ namespace DocumentCatalog.Backfiller
 
         private static BackfillOptions ParseArgs(string[] args)
         {
-            Company? company = null;
-            var dryRun = false;
+            // Default to CII if not specified. Can be overridden with --company argument.
+            Company? company = Company.CII; 
+            // Default to dry run to be safe. Can be overridden with --dry-run argument.
+            var dryRun = true; 
             var showHelp = false;
 
             for (var i = 0; i < args.Length; i++)
