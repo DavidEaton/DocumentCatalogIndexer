@@ -32,11 +32,9 @@ public sealed class BlobMetadataReader : IBlobMetadataReader
                 0,
                 string.Empty,
                 string.Empty,
-                null,
                 properties.Value.LastModified,
                 properties.Value.ContentType,
-                properties.Value.ETag.ToString(),
-                false);
+                properties.Value.ETag.ToString());
         }
 
         return new BlobCatalogItem(
@@ -47,9 +45,7 @@ public sealed class BlobMetadataReader : IBlobMetadataReader
             documentTypeToken,
             DocumentBlobParser.HumanizeDocumentType(documentTypeToken),
             properties.Value.LastModified,
-            properties.Value.LastModified,
             properties.Value.ContentType,
-            properties.Value.ETag.ToString(),
-            true);
+            properties.Value.ETag.ToString());
     }
 }

@@ -118,8 +118,7 @@ public sealed class CatalogBackfillService(
                 DocumentTypeDisplay: documentTypeDisplay,
                 UpdatedUtc: blobItem.Properties.LastModified,
                 ContentType: blobItem.Properties.ContentType,
-                BlobETag: blobItem.Properties.ETag?.ToString(),
-                IsCatalogCandidate: true);
+                BlobETag: blobItem.Properties.ETag?.ToString());
 
             if (dryRun)
             {

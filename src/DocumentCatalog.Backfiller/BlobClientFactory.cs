@@ -59,10 +59,13 @@ namespace DocumentCatalog.Backfiller
         {
             var azureClientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
             if (!string.IsNullOrWhiteSpace(azureClientId) && HasManagedIdentityEndpoint())
-                return new ManagedIdentityCredential(azureClientId);
+            {
+                var id = ManagedIdentityId.FromUserAssignedClientId(azureClientId);
+                return new ManagedIdentityCredential(id);
+            }
 
             if (HasManagedIdentityEndpoint())
-                return new ManagedIdentityCredential();
+                return new ManagedIdentityCredential(new ManagedIdentityCredentialOptions());
 
             return new ChainedTokenCredential(
                 new AzureCliCredential(),

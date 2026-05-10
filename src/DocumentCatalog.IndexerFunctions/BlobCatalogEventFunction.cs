@@ -56,14 +56,6 @@ public sealed class BlobCatalogEventFunction(
             routed.BlobName,
             cancellationToken);
 
-        if (!item.IsCatalogCandidate)
-        {
-            _logger.LogInformation(
-                "Skipping blob {BlobName} because it does not match the catalog naming convention.",
-                routed.BlobName);
-            return;
-        }
-
         await _commandService.UpsertAsync(item, cancellationToken);
     }
 }
