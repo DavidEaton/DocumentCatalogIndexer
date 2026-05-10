@@ -20,6 +20,7 @@ public sealed class CatalogBackfillService(
 
     private const string ContainerName = "hrdocs";
     private const int ProgressInterval = 250;
+    private const string CommandText = "HR.EmployeeDocumentCatalogUpsertFromBlobEvent";
 
     public async Task<BackfillResult> BackfillCompanyAsync(
         Company company,
@@ -27,17 +28,13 @@ public sealed class CatalogBackfillService(
         CancellationToken cancellationToken)
     {
         var accountUrl = _blobClientFactory.GetAccountUrl(company);
-        var databaseName = _sqlConnectionStringFactory.GetDatabaseName(company);
-        var sqlServer = _sqlConnectionStringFactory.GetServerName();
         var credentialMode = _blobClientFactory.GetCredentialMode();
 
         _logger.LogInformation(
-            "Resolved configuration for company {Company}. BlobAccountUrl={BlobAccountUrl} Container={ContainerName} SqlServer={SqlServer} SqlDatabase={SqlDatabase} DryRun={DryRun} CredentialMode={CredentialMode}",
+            "Resolved configuration for company {Company}. BlobAccountUrl={BlobAccountUrl} Container={ContainerName} DryRun={DryRun} CredentialMode={CredentialMode}",
             company,
             accountUrl,
             ContainerName,
-            sqlServer,
-            databaseName,
             dryRun,
             credentialMode);
 
@@ -196,7 +193,7 @@ public sealed class CatalogBackfillService(
         await connection.OpenAsync(cancellationToken);
 
         await using var command = new SqlCommand(
-            "HR.EmployeeDocumentCatalogUpsertFromBlobEvent",
+            CommandText,
             connection)
         {
             CommandType = CommandType.StoredProcedure,

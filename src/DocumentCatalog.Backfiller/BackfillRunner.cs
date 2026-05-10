@@ -89,7 +89,7 @@ namespace DocumentCatalog.Backfiller
             // Default to CII if not specified. Can be overridden with --company argument.
             Company? company = Company.CII; 
             // Default to dry run to be safe. Can be overridden with --dry-run argument.
-            var dryRun = true; 
+            var dryRun = false; 
             var showHelp = false;
 
             for (var i = 0; i < args.Length; i++)
