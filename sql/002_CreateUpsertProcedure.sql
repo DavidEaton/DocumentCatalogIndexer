@@ -1,4 +1,15 @@
-create or alter procedure Common.usp_EmployeeDocumentCatalog_UpsertFromBlobEvent
+-- Run in 
+-- CII database CiiSql ✓
+-- CSI database CsiSql 
+-- DSI database DsiSql
+-- DSN database DsnSql
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Replaces Common.usp_EmployeeDocumentCatalog_UpsertFromBlobEvent
+create or alter procedure HR.EmployeeDocumentCatalogUpsertFromBlobEvent
     @BlobName            nvarchar(512),
     @BlobNameHash        varbinary(32),
     @EmployeeId          int,
@@ -12,7 +23,7 @@ begin
     set nocount on;
     set xact_abort on;
 
-    update Common.EmployeeDocumentCatalog
+    update HR.EmployeeDocumentCatalog
     set
         EmployeeId = @EmployeeId,
         DocumentTypeToken = @DocumentTypeToken,
@@ -27,7 +38,7 @@ begin
 
     if @@rowcount = 0
     begin
-        insert into Common.EmployeeDocumentCatalog
+        insert into HR.EmployeeDocumentCatalog
         (
             BlobName,
             BlobNameHash,

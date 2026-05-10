@@ -191,7 +191,6 @@ public sealed class CatalogBackfillService(
         CancellationToken cancellationToken)
     {
         var connectionString = _sqlConnectionStringFactory.Create(item.Company);
-        var stopwatch = Stopwatch.StartNew();
 
         await using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync(cancellationToken);
@@ -209,23 +208,17 @@ public sealed class CatalogBackfillService(
         command.Parameters.AddWithValue("@EmployeeId", item.EmployeeId);
         command.Parameters.AddWithValue("@DocumentTypeToken", item.DocumentTypeToken);
         command.Parameters.AddWithValue("@DocumentTypeDisplay", item.DocumentTypeDisplay);
-        command.Parameters.AddWithValue("@EmployeeName", DBNull.Value);
-        command.Parameters.AddWithValue("@HomeDepartment", DBNull.Value);
-        command.Parameters.AddWithValue("@EmployeeActive", false);
-        command.Parameters.AddWithValue("@EmployeeLookupLastSyncedUtc", DBNull.Value);
         command.Parameters.AddWithValue("@UpdatedUtc", (object?)item.UpdatedUtc ?? DBNull.Value);
         command.Parameters.AddWithValue("@ContentType", (object?)item.ContentType ?? DBNull.Value);
         command.Parameters.AddWithValue("@BlobETag", (object?)item.BlobETag ?? DBNull.Value);
 
         await command.ExecuteNonQueryAsync(cancellationToken);
 
-        stopwatch.Stop();
-
         _logger.LogDebug(
-            "Upserted blob {BlobName} for company {Company} in {ElapsedMs} ms.",
+            "Upserted blob {BlobName} for company {Company} with {command.CommandTimeout} CommandTimeout.",
             item.BlobName,
             item.Company,
-            stopwatch.ElapsedMilliseconds);
+            command.CommandTimeout);
     }
 }
 
