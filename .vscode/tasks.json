@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-backfiller",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/DocumentCatalog.Backfiller/DocumentCatalog.Backfiller.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
