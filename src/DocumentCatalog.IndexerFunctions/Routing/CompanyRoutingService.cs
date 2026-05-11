@@ -23,17 +23,25 @@ public sealed class CompanyRoutingService : ICompanyRoutingService
 
         var container = segments[0];
         var blobName = segments[1];
+        var company = ResolveCompanyKey(accountName, container);
 
-        var company = (accountName.ToLowerInvariant(), container.ToLowerInvariant()) switch
+        return new RoutedBlobEvent(company, accountName, container, blobName);
+    }
+
+    private static string ResolveCompanyKey(string accountName, string container)
+    {
+        var normalizedAccountName = accountName.ToLowerInvariant();
+        var normalizedContainer = container.ToLowerInvariant();
+
+        return (normalizedAccountName, normalizedContainer) switch
         {
-            ("cii", CONTAINERNAME) => Company.CII,
-            ("csii", CONTAINERNAME) => Company.CSI,
-            ("dsii", CONTAINERNAME) => Company.DSI,
-            ("dsni", CONTAINERNAME) => Company.DSN,
+            ("cii", CONTAINERNAME) => nameof(Company.CII),
+            ("csii", CONTAINERNAME) => nameof(Company.CSI),
+            ("dsii", CONTAINERNAME) => nameof(Company.DSI),
+            ("dsni", CONTAINERNAME) => nameof(Company.DSN),
+
             _ => throw new InvalidOperationException(
                 $"No company mapping exists for account '{accountName}' and container '{container}'.")
         };
-
-        return new RoutedBlobEvent(company, accountName, container, blobName);
     }
 }

@@ -1,4 +1,5 @@
 using Azure.Messaging.EventGrid;
+using DocumentCatalog.IndexerFunctions.Models;
 using DocumentCatalog.IndexerFunctions.Routing;
 using DocumentCatalog.IndexerFunctions.Sql;
 using DocumentCatalog.IndexerFunctions.Storage;
@@ -23,7 +24,7 @@ public sealed class BlobCatalogEventFunction(
         [EventGridTrigger] EventGridEvent eventGridEvent,
         CancellationToken cancellationToken)
     {
-        var routed = _routingService.Resolve(eventGridEvent);
+        RoutedBlobEvent routed = _routingService.Resolve(eventGridEvent);
 
         _logger.LogInformation(
             "Received blob event {EventType} for {Company}, blob {BlobName}.",

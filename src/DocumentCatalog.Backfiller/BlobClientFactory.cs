@@ -1,7 +1,6 @@
 using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
-using DocumentCatalog.IndexerFunctions.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System.Data.Common;
@@ -22,14 +21,14 @@ namespace DocumentCatalog.Backfiller
             _configuration = configuration;
         }
 
-        public BlobContainerClient CreateContainerClient(Company company, string containerName)
+        public BlobContainerClient CreateContainerClient(string company, string containerName)
         {
             var accountUrl = GetAccountUrl(company);
             var serviceClient = new BlobServiceClient(new Uri(accountUrl), Credential);
             return serviceClient.GetBlobContainerClient(containerName);
         }
 
-        public string GetAccountUrl(Company company)
+        public string GetAccountUrl(string company)
         {
             if (_hostEnvironment.IsDevelopment())
             {
@@ -40,10 +39,10 @@ namespace DocumentCatalog.Backfiller
 
             var accountUrl = company switch
             {
-                Company.CII => Environment.GetEnvironmentVariable("CII_BLOB_ACCOUNT_URL"),
-                Company.CSI => Environment.GetEnvironmentVariable("CSI_BLOB_ACCOUNT_URL"),
-                Company.DSI => Environment.GetEnvironmentVariable("DSI_BLOB_ACCOUNT_URL"),
-                Company.DSN => Environment.GetEnvironmentVariable("DSN_BLOB_ACCOUNT_URL"),
+                "CII" => Environment.GetEnvironmentVariable("CII_BLOB_ACCOUNT_URL"),
+                "CSI" => Environment.GetEnvironmentVariable("CSI_BLOB_ACCOUNT_URL"),
+                "DSI" => Environment.GetEnvironmentVariable("DSI_BLOB_ACCOUNT_URL"),
+                "DSN" => Environment.GetEnvironmentVariable("DSN_BLOB_ACCOUNT_URL"),
                 _ => null
             };
 
@@ -53,14 +52,14 @@ namespace DocumentCatalog.Backfiller
             return accountUrl;
         }
 
-        private string? GetBlobStorageConnectionString(Company company)
+        private string? GetBlobStorageConnectionString(string company)
         {
             var companyCode = company.ToString();
             var key = $"CompanyConnections:Companies:{companyCode}:BlobStorageConnectionString";
             return _configuration[key];
         }
 
-        private static string BuildAccountUrlFromConnectionString(string connectionString, Company company)
+        private static string BuildAccountUrlFromConnectionString(string connectionString, string company)
         {
             var builder = new DbConnectionStringBuilder { ConnectionString = connectionString };
 

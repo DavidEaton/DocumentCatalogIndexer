@@ -20,10 +20,7 @@ namespace DocumentCatalog.Backfiller
                 return 0;
             }
 
-            var companies = options.Company is null
-                ? Enum.GetValues<Company>()
-                : [options.Company.Value];
-
+            var companies = new List<string>();
             var runId = Guid.NewGuid().ToString("n");
             var buildMarker = Environment.GetEnvironmentVariable("BUILD_MARKER") ?? "local-dev";
 
@@ -86,10 +83,10 @@ namespace DocumentCatalog.Backfiller
 
         private static BackfillOptions ParseArgs(string[] args)
         {
-            // Default to CII if not specified. Can be overridden with --company argument.
-            Company? company = Company.CII; 
-            // Default to dry run to be safe. Can be overridden with --dry-run argument.
-            var dryRun = false; 
+            var company = Environment.GetEnvironmentVariable("COMPANY");
+            var dryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
+            var dryRun = !bool.TryParse(dryRunValue, out var parsedDryRun)
+                || parsedDryRun;
             var showHelp = false;
 
             for (var i = 0; i < args.Length; i++)
@@ -109,10 +106,18 @@ namespace DocumentCatalog.Backfiller
                         if (i + 1 >= args.Length)
                             throw new ArgumentException("--company requires a value.");
 
-                        if (!Enum.TryParse<Company>(args[++i], ignoreCase: true, out var parsed))
-                            throw new ArgumentException($"Invalid company '{args[i]}'.");
+                        var companyArg = args[++i];
 
-                        company = parsed;
+                        if (int.TryParse(companyArg, out _))
+                            throw new ArgumentException($"Invalid company '{companyArg}'.");
+
+                        if (!Enum.TryParse<Company>(companyArg, ignoreCase: true, out var parsed) ||
+                            !Enum.IsDefined(parsed))
+                        {
+                            throw new ArgumentException($"Invalid company '{companyArg}'.");
+                        }
+
+                        company = parsed.ToString();
                         break;
 
                     default:
@@ -136,7 +141,7 @@ namespace DocumentCatalog.Backfiller
         }
 
         private sealed record BackfillOptions(
-            Company? Company,
+            string? Company,
             bool DryRun,
             bool ShowHelp);
     }

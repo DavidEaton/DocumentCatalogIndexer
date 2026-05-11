@@ -1,7 +1,7 @@
 namespace DocumentCatalog.IndexerFunctions.Models
 {
     public sealed record BlobCatalogItem(
-        Company Company,
+        string Company,
         string BlobName,
         byte[] BlobNameHash,
         int EmployeeId,

@@ -1,8 +1,8 @@
 -- Run in 
 -- CII database CiiSql ✓
--- CSI database CsiSql 
--- DSI database DsiSql
--- DSN database DsnSql
+-- CSI database CsiSql ✓
+-- DSI database DsiSql ✓
+-- DSN database DsnSql ✓
 
 SET ANSI_NULLS ON
 GO

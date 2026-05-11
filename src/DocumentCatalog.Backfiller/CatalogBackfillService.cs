@@ -1,5 +1,4 @@
 using System.Data;
-using System.Diagnostics;
 using Azure;
 using Azure.Storage.Blobs.Models;
 using DocumentCatalog.IndexerFunctions.Models;
@@ -23,7 +22,7 @@ public sealed class CatalogBackfillService(
     private const string CommandText = "HR.EmployeeDocumentCatalogUpsertFromBlobEvent";
 
     public async Task<BackfillResult> BackfillCompanyAsync(
-        Company company,
+        string company,
         bool dryRun,
         CancellationToken cancellationToken)
     {

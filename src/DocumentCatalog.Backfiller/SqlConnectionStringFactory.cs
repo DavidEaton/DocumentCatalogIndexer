@@ -1,4 +1,3 @@
-using DocumentCatalog.IndexerFunctions.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -11,7 +10,7 @@ public sealed class SqlConnectionStringFactory(
     private readonly IHostEnvironment _hostEnvironment = hostEnvironment;
     private readonly IConfiguration _configuration = configuration;
 
-    public string Create(Company company)
+    public string Create(string company)
     {
         if (_hostEnvironment.IsDevelopment())
         {
@@ -44,14 +43,14 @@ public sealed class SqlConnectionStringFactory(
         return server;
     }
 
-    public string GetDatabaseName(Company company)
+    public string GetDatabaseName(string company)
     {
         var database = company switch
         {
-            Company.CII => Environment.GetEnvironmentVariable("CII_SQL_DATABASE"),
-            Company.CSI => Environment.GetEnvironmentVariable("CSI_SQL_DATABASE"),
-            Company.DSI => Environment.GetEnvironmentVariable("DSI_SQL_DATABASE"),
-            Company.DSN => Environment.GetEnvironmentVariable("DSN_SQL_DATABASE"),
+            "CII" => Environment.GetEnvironmentVariable("CII_SQL_DATABASE"),
+            "CSI" => Environment.GetEnvironmentVariable("CSI_SQL_DATABASE"),
+            "DSI" => Environment.GetEnvironmentVariable("DSI_SQL_DATABASE"),
+            "DSN" => Environment.GetEnvironmentVariable("DSN_SQL_DATABASE"),
             _ => throw new InvalidOperationException($"Unsupported company '{company}'.")
         };
 

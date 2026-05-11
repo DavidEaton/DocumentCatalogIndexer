@@ -7,7 +7,7 @@ namespace DocumentCatalog.IndexerFunctions.Storage;
 public sealed class BlobMetadataReader : IBlobMetadataReader
 {
     public async Task<BlobCatalogItem> GetBlobInfoAsync(
-        Company company,
+        string company,
         string containerName,
         string blobName,
         CancellationToken cancellationToken)

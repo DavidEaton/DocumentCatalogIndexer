@@ -34,7 +34,7 @@ public sealed class BlobCatalogCommandService : IBlobCatalogCommandService
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    public async Task MarkDeletedAsync(Company company, string blobName, CancellationToken cancellationToken)
+    public async Task MarkDeletedAsync(string company, string blobName, CancellationToken cancellationToken)
     {
         var connectionString = GetSqlConnectionString(company);
         var blobNameHash = DocumentBlobParser.ComputeBlobNameHash(blobName);
@@ -56,7 +56,7 @@ public sealed class BlobCatalogCommandService : IBlobCatalogCommandService
         await command.ExecuteNonQueryAsync(cancellationToken);
     }
 
-    private static string GetSqlConnectionString(Company company) =>
+    private static string GetSqlConnectionString(string company) =>
         Environment.GetEnvironmentVariable($"{company}_SQL_CONNECTION")
         ?? throw new InvalidOperationException($"Missing SQL connection string for {company}.");
 }

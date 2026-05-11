@@ -1,10 +1,8 @@
-using DocumentCatalog.IndexerFunctions.Models;
-
 namespace DocumentCatalog.Backfiller;
 
 public interface ISqlConnectionStringFactory
 {
-    string Create(Company company);
+    string Create(string company);
     string GetServerName();
-    string GetDatabaseName(Company company);
+    string GetDatabaseName(string company);
 }
