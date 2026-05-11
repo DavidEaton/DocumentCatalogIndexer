@@ -12,6 +12,7 @@ namespace DocumentCatalog.Backfiller
 
         public async Task<int> RunAsync(string[] args)
         {
+            var rawDryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
             var options = ParseArgs(args);
 
             if (options.ShowHelp)
@@ -39,6 +40,11 @@ namespace DocumentCatalog.Backfiller
                 string.Join(",", companies),
                 options.DryRun);
 
+            _logger.LogInformation(
+                "Backfill dry-run configuration resolved. DRY_RUN(raw)={RawDryRunValue} DryRun(parsed)={DryRun}",
+                rawDryRunValue ?? "<null>",
+                options.DryRun);
+
             foreach (var company in companies)
             {
 
@@ -64,6 +70,7 @@ namespace DocumentCatalog.Backfiller
                         result.Upserted,
                         result.SkippedInvalidName,
                         result.SqlFailures);
+
                 }
                 catch (Exception ex)
                 {

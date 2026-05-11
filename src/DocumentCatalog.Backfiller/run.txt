@@ -1,3 +1,21 @@
+Publish via Powershell at
+C:\code\DocumentCatalogIndexer\DocumentCatalog.Backfiller\
+
+$tag = "2026.05.11.1"
+# Build image
+./deploy-documentcatalog-backfiller.ps1 -ImageTag $tag -BuildOnly
+...then
+# deploy/update job to the already-pushed image
+./deploy-documentcatalog-backfiller.ps1 -ImageTag $tag -SkipBuild
+
+# optional: verify the job template is on the intended tag
+az containerapp job show `
+  --name documentcatalog-backfiller `
+  --resource-group DocumentCatalogIndexer `
+  --query "properties.template.containers[0].image" -o tsv
+
+**************************************************************************
+RUN
 Powershell at C:\code\DocumentCatalogIndexer>
 
 Dry Run

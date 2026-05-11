@@ -5,7 +5,7 @@ param(
     [switch]$SkipBuild,
     [switch]$BuildOnly,
     [switch]$StartJob,
-    [ValidateSet("CII","CSI","DSI","DSN")]
+    [ValidateSet("CII", "CSI", "DSI", "DSN")]
     [string]$Company,
     [switch]$DryRun
 )
@@ -87,7 +87,7 @@ function Invoke-Az {
 
             if ($exitCode -ne 0 -and -not $AllowFailure) {
                 throw ("Azure CLI command failed with exit code {0}: {1}" -f `
-                    $exitCode,
+                        $exitCode,
                     $commandText)
             }
 
@@ -135,7 +135,7 @@ function Invoke-Az {
         }
 
         throw ("Azure CLI command failed with exit code {0}: {1}`n{2}" -f `
-            $exitCode,
+                $exitCode,
             $commandText,
             $outputText)
     }
@@ -221,10 +221,10 @@ if ($BuildOnly) { return }
 
 # Ensure Container Apps Environment
 $envExists = (Invoke-Az -AllowFailure -AllowNonJsonOutput `
-    containerapp env show `
-    --name $ContainerAppsEnvironmentName `
-    --resource-group $ResourceGroupName `
-    --output none).ExitCode -eq 0
+        containerapp env show `
+        --name $ContainerAppsEnvironmentName `
+        --resource-group $ResourceGroupName `
+        --output none).ExitCode -eq 0
 
 if (-not $envExists) {
     Invoke-Az containerapp env create `
@@ -242,6 +242,8 @@ $envVars = @(
     "CSI_SQL_DATABASE=$($SqlDatabases.CSI)",
     "DSI_SQL_DATABASE=$($SqlDatabases.DSI)",
     "DSN_SQL_DATABASE=$($SqlDatabases.DSN)",
+    "COMPANY=",
+    "DRY_RUN=TRUE",
     "BUILD_MARKER=$ImageTag"
 )
 
