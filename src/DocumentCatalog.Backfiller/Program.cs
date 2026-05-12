@@ -14,13 +14,13 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
     .WriteTo.Console(
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
+        outputTemplate: "{Timestamp:yyyy-MM-dd hh:mm:ss tt zzz} [{Level:u3}] [{SourceContext}] {Message:lj} {NewLine}{Exception}")
     .WriteTo.File(
         path: logPath,
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 14,
         shared: true,
-        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
+        outputTemplate: "{Timestamp:yyyy-MM-dd hh:mm:ss tt zzz} [{Level:u3}] [{SourceContext}] {Message:lj} {NewLine}{Exception}")
     .CreateLogger();
 
 builder.Services.AddSerilog();
