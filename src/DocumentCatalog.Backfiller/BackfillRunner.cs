@@ -22,6 +22,15 @@ namespace DocumentCatalog.Backfiller
             }
 
             var companies = new List<string>();
+            if (!string.IsNullOrWhiteSpace(options.Company))
+            {
+                companies.Add(options.Company);
+            }
+            else
+            {
+                companies.AddRange(Enum.GetNames<Company>());
+            }
+
             var runId = Guid.NewGuid().ToString("n");
             var buildMarker = Environment.GetEnvironmentVariable("BUILD_MARKER") ?? "local-dev";
 
@@ -44,6 +53,8 @@ namespace DocumentCatalog.Backfiller
                 "Backfill dry-run configuration resolved. DRY_RUN(raw)={RawDryRunValue} DryRun(parsed)={DryRun}",
                 rawDryRunValue ?? "<null>",
                 options.DryRun);
+
+            _logger.LogInformation("Resolved companies to process: {Companies}", string.Join(",", companies));
 
             foreach (var company in companies)
             {

@@ -1,7 +1,7 @@
 Publish via Powershell at
 C:\code\DocumentCatalogIndexer\DocumentCatalog.Backfiller\
 
-$tag = "2026.05.11.1"
+$tag = "2026.05.11.3"
 # Build image
 ./deploy-documentcatalog-backfiller.ps1 -ImageTag $tag -BuildOnly
 ...then
