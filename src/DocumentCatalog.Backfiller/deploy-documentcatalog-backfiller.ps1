@@ -244,7 +244,8 @@ $envVars = @(
     "DSN_SQL_DATABASE=$($SqlDatabases.DSN)",
     "COMPANY=",
     "DRY_RUN=TRUE",
-    "BUILD_MARKER=$ImageTag"
+    "BUILD_MARKER=$ImageTag",
+    "BACKFILL_LOG_PATH=/mnt/backfiller-logs/documentcatalog/backfiller/log-.txt"
 )
 
 foreach ($storageAccount in $StorageAccounts) {
