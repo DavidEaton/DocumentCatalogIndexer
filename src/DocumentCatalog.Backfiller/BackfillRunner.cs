@@ -1,19 +1,23 @@
 using DocumentCatalog.IndexerFunctions.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace DocumentCatalog.Backfiller
 {
     public sealed class BackfillRunner(
         ICatalogBackfillService backfillService,
+        IConfiguration configuration,
         ILogger<BackfillRunner> logger)
     {
         private readonly ICatalogBackfillService _backfillService = backfillService;
+        private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<BackfillRunner> _logger = logger;
 
         public async Task<int> RunAsync(string[] args)
         {
             var rawDryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
-            var options = ParseArgs(args);
+            var defaultCompany = _configuration["DefaultCompany"];
+            var options = ParseArgs(args, defaultCompany);
 
             if (options.ShowHelp)
             {
@@ -98,9 +102,13 @@ namespace DocumentCatalog.Backfiller
             return 0;
         }
 
-        private static BackfillOptions ParseArgs(string[] args)
+        private static BackfillOptions ParseArgs(string[] args, string? defaultCompany)
         {
             var company = Environment.GetEnvironmentVariable("COMPANY");
+            if (string.IsNullOrWhiteSpace(company))
+            {
+                company = defaultCompany;
+            }
             var dryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
             var dryRun = !bool.TryParse(dryRunValue, out var parsedDryRun)
                 || parsedDryRun;
