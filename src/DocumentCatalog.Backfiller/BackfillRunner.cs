@@ -53,6 +53,8 @@ namespace DocumentCatalog.Backfiller
                 rawDryRunValue ?? "<null>",
                 options.DryRun);
 
+            _logger.LogInformation("Resolved companies to process: {Companies}", string.Join(",", companies));
+
             foreach (var company in companies)
             {
 
