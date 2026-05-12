@@ -1,11 +1,10 @@
 Publish via Powershell at
 C:\code\DocumentCatalogIndexer\DocumentCatalog.Backfiller\
 
-$tag = "2026.05.11.3"
-# Build image
+$tag = "2026.05.11.6"
+# Build and push image
 ./deploy-documentcatalog-backfiller.ps1 -ImageTag $tag -BuildOnly
-...then
-# deploy/update job to the already-pushed image
+# Deploy/update job to the already-pushed image
 ./deploy-documentcatalog-backfiller.ps1 -ImageTag $tag -SkipBuild
 
 # optional: verify the job template is on the intended tag

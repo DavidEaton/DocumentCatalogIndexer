@@ -6,7 +6,7 @@ using Serilog;
 var builder = Host.CreateApplicationBuilder(args);
 
 var logPath = Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH")
-    ?? "/tmp/documentcatalog-backfiller/log-.txt";
+    ?? "/mnt/backfiller-logs/documentcatalog/backfiller/log-.txt";
 
 Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
 
