@@ -5,22 +5,41 @@ using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var logPath = Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH")
-    ?? "/mnt/backfiller-logs/documentcatalog/backfiller/log-.txt";
+var configuredLogPath = Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH");
+var requestedLogPath = string.IsNullOrWhiteSpace(configuredLogPath)
+    ? "/tmp/documentcatalog-backfiller/log-.txt"
+    : configuredLogPath;
 
-Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
+string effectiveLogPath;
+
+try
+{
+    EnsureLogDirectoryExists(requestedLogPath);
+    effectiveLogPath = requestedLogPath;
+}
+catch (Exception ex)
+{
+    var fallbackLogPath = "/tmp/documentcatalog-backfiller/log-.txt";
+    EnsureLogDirectoryExists(fallbackLogPath);
+    effectiveLogPath = fallbackLogPath;
+
+    Console.Error.WriteLine($"[Backfiller] Failed to initialize requested BACKFILL_LOG_PATH '{requestedLogPath}'. Falling back to '{fallbackLogPath}'. Error: {ex.Message}");
+}
+
+Console.WriteLine($"[Backfiller] Effective log path: {effectiveLogPath}");
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .MinimumLevel.Debug()
     .WriteTo.Console(
-        outputTemplate: "{Timestamp:yyyy-MM-dd hh:mm:ss tt zzz} [{Level:u3}] [{SourceContext}] {Message:lj} {NewLine}{Exception}")
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
     .WriteTo.File(
-        path: logPath,
+        path: effectiveLogPath,
         rollingInterval: RollingInterval.Day,
         retainedFileCountLimit: 14,
         shared: true,
-        outputTemplate: "{Timestamp:yyyy-MM-dd hh:mm:ss tt zzz} [{Level:u3}] [{SourceContext}] {Message:lj} {NewLine}{Exception}")
+        flushToDiskInterval: TimeSpan.FromSeconds(1),
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
     .CreateLogger();
 
 builder.Services.AddSerilog();
@@ -37,7 +56,25 @@ try
     var runner = host.Services.GetRequiredService<BackfillRunner>();
     return await runner.RunAsync(args);
 }
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Backfiller terminated unexpectedly.");
+    Console.Error.WriteLine($"[Backfiller] Fatal error: {ex.Message}");
+    return 1;
+}
 finally
 {
     await Log.CloseAndFlushAsync();
+}
+
+static void EnsureLogDirectoryExists(string logPath)
+{
+    var directory = Path.GetDirectoryName(logPath);
+
+    if (string.IsNullOrWhiteSpace(directory))
+    {
+        throw new InvalidOperationException($"Log path '{logPath}' must include a directory.");
+    }
+
+    Directory.CreateDirectory(directory);
 }

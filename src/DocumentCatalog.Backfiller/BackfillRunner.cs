@@ -30,7 +30,6 @@ namespace DocumentCatalog.Backfiller
             {
                 throw new ArgumentException("No company specified. Set COMPANY or pass --company CII|CSI|DSI|DSN.");
             }
-          
             var runId = Guid.NewGuid().ToString("n");
             var buildMarker = Environment.GetEnvironmentVariable("BUILD_MARKER") ?? "local-dev";
 
