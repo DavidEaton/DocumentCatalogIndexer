@@ -22,6 +22,14 @@ namespace DocumentCatalog.Backfiller
             }
 
             var companies = new List<string>();
+            if (!string.IsNullOrWhiteSpace(options.Company))
+            {
+                companies.Add(options.Company);
+            }
+            else
+            {
+                throw new ArgumentException("No company specified. Set COMPANY or pass --company CII|CSI|DSI|DSN.");
+            }
             var runId = Guid.NewGuid().ToString("n");
             var buildMarker = Environment.GetEnvironmentVariable("BUILD_MARKER") ?? "local-dev";
 

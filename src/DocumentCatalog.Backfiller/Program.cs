@@ -1,20 +1,29 @@
 using DocumentCatalog.Backfiller;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Services.AddLogging(logging =>
-{
-    logging.ClearProviders();
-    logging.AddSimpleConsole(options =>
-    {
-        options.SingleLine = true;
-        options.TimestampFormat = "yyyy-MM-dd HH:mm:ss.fff zzz ";
-        options.IncludeScopes = true;
-    });
-});
+var logPath = Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH")
+    ?? "/tmp/documentcatalog-backfiller/log-.txt";
+
+Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .MinimumLevel.Debug()
+    .WriteTo.Console(
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .WriteTo.File(
+        path: logPath,
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 14,
+        shared: true,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
+    .CreateLogger();
+
+builder.Services.AddSerilog();
 
 builder.Services.AddSingleton<IBlobClientFactory, BlobClientFactory>();
 builder.Services.AddSingleton<ISqlConnectionStringFactory, SqlConnectionStringFactory>();
@@ -23,5 +32,12 @@ builder.Services.AddSingleton<BackfillRunner>();
 
 var host = builder.Build();
 
-var runner = host.Services.GetRequiredService<BackfillRunner>();
-return await runner.RunAsync(args);
+try
+{
+    var runner = host.Services.GetRequiredService<BackfillRunner>();
+    return await runner.RunAsync(args);
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
+}
