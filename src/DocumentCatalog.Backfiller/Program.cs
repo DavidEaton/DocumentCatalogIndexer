@@ -5,7 +5,10 @@ using Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var configuredLogPath = Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH");
+var configuredLogPath = builder.Environment.IsDevelopment()
+    ? builder.Configuration["LogPath"]
+    : Environment.GetEnvironmentVariable("BACKFILL_LOG_PATH");
+
 var requestedLogPath = string.IsNullOrWhiteSpace(configuredLogPath)
     ? "/tmp/documentcatalog-backfiller/log-.txt"
     : configuredLogPath;
