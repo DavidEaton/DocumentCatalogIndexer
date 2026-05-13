@@ -23,6 +23,16 @@ namespace DocumentCatalog.Backfiller
 
         public BlobContainerClient CreateContainerClient(string company, string containerName)
         {
+            if (_hostEnvironment.IsDevelopment())
+            {
+                var secretConnectionString = GetBlobStorageConnectionString(company);
+                if (!string.IsNullOrWhiteSpace(secretConnectionString))
+                {
+                    var connectionStringServiceClient = new BlobServiceClient(secretConnectionString);
+                    return connectionStringServiceClient.GetBlobContainerClient(containerName);
+                }
+            }
+
             var accountUrl = GetAccountUrl(company);
             var serviceClient = new BlobServiceClient(new Uri(accountUrl), Credential);
             return serviceClient.GetBlobContainerClient(containerName);
