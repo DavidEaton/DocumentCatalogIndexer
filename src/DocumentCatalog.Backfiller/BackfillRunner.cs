@@ -17,7 +17,8 @@ namespace DocumentCatalog.Backfiller
         {
             var rawDryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
             var defaultCompany = _configuration["DefaultCompany"];
-            var options = ParseArgs(args, defaultCompany);
+            var defaultDryRun = _configuration.GetValue("DefaultDryRun", true);
+            var options = ParseArgs(args, defaultCompany, defaultDryRun);
 
             if (options.ShowHelp)
             {
@@ -102,7 +103,7 @@ namespace DocumentCatalog.Backfiller
             return 0;
         }
 
-        private static BackfillOptions ParseArgs(string[] args, string? defaultCompany)
+        private static BackfillOptions ParseArgs(string[] args, string? defaultCompany, bool defaultDryRun)
         {
             var company = Environment.GetEnvironmentVariable("COMPANY");
             if (string.IsNullOrWhiteSpace(company))
@@ -111,7 +112,8 @@ namespace DocumentCatalog.Backfiller
             }
             var dryRunValue = Environment.GetEnvironmentVariable("DRY_RUN");
             var dryRun = !bool.TryParse(dryRunValue, out var parsedDryRun)
-                || parsedDryRun;
+                ? defaultDryRun
+                : parsedDryRun;
             var showHelp = false;
 
             for (var i = 0; i < args.Length; i++)
