@@ -23,7 +23,6 @@ AS
         ,C.BlobNameHash
         ,C.Id
         ,C.IsDeleted
-        ,YEAR(C.UpdatedUtc) AS [Year]
     FROM [HR].[EmployeeDocumentCatalog] C
         INNER JOIN
         [HR].[EmployeeDocumentsEmployees] E
