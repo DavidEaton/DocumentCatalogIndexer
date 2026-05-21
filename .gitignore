@@ -457,3 +457,4 @@ wwwroot/lib/
 
 !.vscode/tasks.json
 !.vscode/launch.json
+*.lscache
